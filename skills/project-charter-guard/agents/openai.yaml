@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Charter Guard"
+  short_description: "Read and enforce Projet.md rules"
+  default_prompt: "Use $project-charter-guard to align coding with the repository charter."

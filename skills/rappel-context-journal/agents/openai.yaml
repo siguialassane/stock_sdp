@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rappel Context Journal"
+  short_description: "Update rappel.md after changes"
+  default_prompt: "Use $rappel-context-journal to record the latest project changes in rappel.md."

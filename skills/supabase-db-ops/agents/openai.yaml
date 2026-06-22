@@ -1,0 +1,4 @@
+interface:
+  display_name: "Supabase DB Ops"
+  short_description: "Connect, backup, and reset Supabase DB"
+  default_prompt: "Use $supabase-db-ops to connect this repository to Supabase, export the remote database safely, and prepare a clean reset."
