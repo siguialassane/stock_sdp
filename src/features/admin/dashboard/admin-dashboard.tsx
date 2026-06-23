@@ -1,4 +1,4 @@
-import { AdminPageHeader } from "@/features/admin/components/admin-page-header";
+import { PageHeader } from "@/components/page-header";
 import { AdminKpiGrid } from "@/features/admin/dashboard/admin-kpi-grid";
 import { AgentActivityCard } from "@/features/admin/dashboard/agent-activity-card";
 import { OperationalWatchCard } from "@/features/admin/dashboard/operational-watch-card";
@@ -15,7 +15,7 @@ import { QuickActionsCard } from "@/features/admin/dashboard/quick-actions-card"
 export function AdminDashboard() {
   return (
     <div className="space-y-6">
-      <AdminPageHeader
+      <PageHeader
         title="Tableau de bord"
         description="Vue d'ensemble de l'activite et de la configuration."
       />

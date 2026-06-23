@@ -55,6 +55,8 @@ export interface Agent {
   actif: boolean;
   statut: "pending" | "active" | "suspended";
   codeAgent?: string;
+  identifiant?: string;
+  motDePasseInitial?: string;
   premierAcces: boolean;
   derniereConnexion?: string;
   createdAt: string;

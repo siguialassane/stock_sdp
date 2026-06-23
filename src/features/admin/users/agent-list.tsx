@@ -5,7 +5,7 @@ import { useAuth } from "@/features/auth/auth-context";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState } from "@/features/admin/components/empty-state";
+import { EmptyState } from "@/components/empty-state";
 import { useAdminStore } from "@/features/admin/store/admin-store";
 import type { Agent } from "@/features/admin/types";
 import { AgentDetailDialog } from "@/features/admin/users/agent-detail-dialog";

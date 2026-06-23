@@ -16,6 +16,9 @@ export function readAuthSession(): AuthSession | null {
       displayName: session.displayName ?? session.username,
       email: session.email ?? "",
       role: session.role,
+      authMode: session.authMode === "table" ? "table" : "supabase",
+      sessionToken: typeof session.sessionToken === "string" ? session.sessionToken : undefined,
+      loginIdentifier: typeof session.loginIdentifier === "string" ? session.loginIdentifier : undefined,
     };
   } catch {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);

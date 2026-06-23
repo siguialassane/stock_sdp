@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/toast/toast";
 import { useAdminStore } from "@/features/admin/store/admin-store";
 import type { Agent, RoleName } from "@/features/admin/types";
 
@@ -16,6 +17,7 @@ function buildAgentCode(role: RoleName) {
 
 export function AgentForm({ onCancel, onSaved, initialAgent }: { onCancel: () => void; onSaved: (agent: Agent) => void; initialAgent?: Agent | null }) {
   const { agents, addAgent, updateAgent } = useAdminStore();
+  const toast = useToast();
   const [fullName, setFullName] = useState(initialAgent?.nom ?? "");
   const [email, setEmail] = useState(initialAgent?.email ?? "");
   const [role, setRole] = useState<RoleName>(initialAgent?.role ?? "Magasin");
@@ -37,9 +39,12 @@ export function AgentForm({ onCancel, onSaved, initialAgent }: { onCancel: () =>
       const saved = isEditMode
         ? await updateAgent({ id: initialAgent!.id, fullName: fullName.trim(), email: email.trim().toLowerCase(), role, agentCode: agentCode.trim().toUpperCase() })
         : await addAgent({ fullName: fullName.trim(), email: email.trim().toLowerCase(), role, agentCode: agentCode.trim().toUpperCase() });
+      toast.success({ title: isEditMode ? "Agent modifie" : "Agent cree", message: `${fullName.trim()} (${role}) a ete ${isEditMode ? "mis a jour" : "ajoute"} avec succes.` });
       onSaved(saved);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Enregistrement impossible.");
+      const message = reason instanceof Error ? reason.message : "Enregistrement impossible.";
+      setError(message);
+      toast.error({ title: "Echec de l'enregistrement", message });
     } finally {
       setIsSaving(false);
     }

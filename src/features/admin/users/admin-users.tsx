@@ -2,7 +2,7 @@ import { useState } from "react";
 import { UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { AdminPageHeader } from "@/features/admin/components/admin-page-header";
+import { PageHeader } from "@/components/page-header";
 import type { Agent } from "@/features/admin/types";
 import { AgentAccessCard } from "@/features/admin/users/agent-access-card";
 import { AgentForm } from "@/features/admin/users/agent-form";
@@ -32,7 +32,7 @@ export function AdminUsers() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader title="Utilisateurs" description="Agents, roles et premiers acces de l'application." action={<Button type="button" onClick={openCreate}><UserPlus className="mr-2 h-4 w-4" />Nouvel agent</Button>} />
+      <PageHeader title="Utilisateurs" description="Agents, roles et premiers acces de l'application." action={<Button type="button" onClick={openCreate}><UserPlus className="mr-2 h-4 w-4" />Nouvel agent</Button>} />
       {createdAgent && <AgentAccessCard agent={createdAgent} onClose={() => setCreatedAgent(null)} />}
       {formOpen && <AgentForm onCancel={() => { setFormOpen(false); setEditingAgent(null); }} onSaved={handleSaved} initialAgent={editingAgent} />}
       {!formOpen && <AgentList onCreate={openCreate} onEdit={openEdit} />}

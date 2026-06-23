@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Boxes, Tags } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { AdminPageHeader } from "@/features/admin/components/admin-page-header";
+import { PageHeader } from "@/components/page-header";
 import { CATALOG_SECTIONS, type CatalogEditTarget, type CatalogSection } from "@/features/admin/catalog/catalog-types";
 import { ProductForm } from "@/features/admin/catalog/product-form";
 import { ProductList } from "@/features/admin/catalog/product-list";
@@ -44,7 +44,7 @@ export function AdminCatalog() {
 
   return (
     <div className="space-y-6">
-      <AdminPageHeader
+      <PageHeader
         title="Catalogue"
         description="Un type identifie chaque produit; ses variantes restent gerees dans le produit."
         action={

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, Loader2, Pencil, Power, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/toast/toast";
 
 interface CatalogRowActionsProps {
   active: boolean;
@@ -26,13 +27,25 @@ export function CatalogRowActions({
 }: CatalogRowActionsProps) {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const toast = useToast();
+
+  const handleToggle = async () => {
+    try {
+      await onToggle();
+      toast.success({ title: active ? "Reference desactivee" : "Reference activee", message: active ? "Elle n'est plus visible des autres modules." : "Elle est de nouveau disponible." });
+    } catch {
+      toast.error({ title: "Action impossible", message: "Le changement de statut a echoue." });
+    }
+  };
 
   const handleDelete = async () => {
     setDeleting(true);
     try {
       await onDelete();
       setConfirming(false);
+      toast.success({ title: "Suppression effectuee", message: "La reference a ete retiree du catalogue." });
     } catch {
+      toast.error({ title: "Suppression impossible", message: "La suppression a echoue." });
       return;
     } finally {
       setDeleting(false);
@@ -75,7 +88,7 @@ export function CatalogRowActions({
         variant="ghost"
         size="icon"
         aria-label={active ? "Desactiver" : "Activer"}
-        onClick={() => void onToggle()}
+        onClick={() => void handleToggle()}
       >
         <Power className="h-4 w-4" />
       </Button>

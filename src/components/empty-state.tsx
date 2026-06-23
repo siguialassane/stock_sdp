@@ -11,8 +11,10 @@ interface EmptyStateProps {
 }
 
 /**
- * Etat vide standardise des ecrans Admin.
+ * Etat vide standardise des ecrans.
  * Conteneur en pointilles, icone centree, message et CTA optionnel.
+ *
+ * Initialement dans features/admin, extrait ici en composant generique partage.
  */
 export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (

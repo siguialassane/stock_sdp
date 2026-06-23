@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Eye, EyeOff, Sparkles } from "lucide-react";
 import { useAuth } from "@/features/auth/auth-context";
-import { signInAdmin } from "@/features/auth/auth.service";
+import { completeFirstLogin, signInUser } from "@/features/auth/auth.service";
+import type { AppRole } from "@/features/auth/types";
 
 
 interface PupilProps {
@@ -100,6 +101,21 @@ interface EyeBallProps {
   isClosed?: boolean;
   forceLookX?: number;
   forceLookY?: number;
+}
+
+interface PendingFirstLogin {
+  identifier: string;
+  fullName: string;
+  email: string;
+  role: Exclude<AppRole, "Admin">;
+  accessCode: string;
+  sessionToken: string;
+}
+
+function routeForRole(role: AppRole) {
+  if (role === "Admin") return "/admin/dashboard" as const;
+  if (role === "Commercial") return "/commercial/dashboard" as const;
+  return "/dashboard" as const;
 }
 
 const EyeBall = ({ 
@@ -196,6 +212,11 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingFirstLogin, setPendingFirstLogin] = useState<PendingFirstLogin | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [firstLoginError, setFirstLoginError] = useState("");
+  const [isActivating, setIsActivating] = useState(false);
   const [mouseX, setMouseX] = useState<number>(0);
   const [mouseY, setMouseY] = useState<number>(0);
   const [isPurpleBlinking, setIsPurpleBlinking] = useState(false);
@@ -210,6 +231,12 @@ function LoginPage() {
   const blackRef = useRef<HTMLDivElement>(null);
   const yellowRef = useRef<HTMLDivElement>(null);
   const orangeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const identifierFromLink = params.get("identifier");
+    if (identifierFromLink) setUsername(identifierFromLink);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -364,16 +391,58 @@ function LoginPage() {
     setIsLoading(true);
 
     try {
-      const session = await signInAdmin(username.trim(), password);
+      const result = await signInUser(username.trim(), password);
       console.log("✅ Login successful!");
-      login(session);
-      await navigate({ to: "/admin/dashboard", replace: true });
+      if (result.kind === "first-login") {
+        setPendingFirstLogin({
+          identifier: result.candidate.login_identifier,
+          fullName: result.candidate.full_name,
+          email: result.candidate.email,
+          role: result.candidate.role_code === "commercial" ? "Commercial" : result.candidate.role_code === "magasin" ? "Magasin" : "Caisse",
+          accessCode: result.candidate.agent_code,
+          sessionToken: result.candidate.session_token,
+        });
+        setNewPassword("");
+        setConfirmPassword("");
+        setFirstLoginError("");
+        setIsLoading(false);
+        return;
+      }
+
+      login(result.session);
+      await navigate({ to: routeForRole(result.session.role), replace: true });
     } catch (loginError) {
       setError(loginError instanceof Error ? loginError.message : "Connexion impossible.");
       console.log("❌ Login failed");
     }
 
     setIsLoading(false);
+  };
+
+  const handleFirstLoginActivation = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!pendingFirstLogin) return;
+
+    setFirstLoginError("");
+    if (newPassword.length < 6) return setFirstLoginError("Le nouveau mot de passe doit contenir au moins 6 caracteres.");
+    if (newPassword !== confirmPassword) return setFirstLoginError("La confirmation du mot de passe ne correspond pas.");
+
+    setIsActivating(true);
+
+    try {
+      const session = await completeFirstLogin({
+        sessionToken: pendingFirstLogin.sessionToken,
+        newPassword,
+      });
+      login(session);
+      setPendingFirstLogin(null);
+      setPassword("");
+      await navigate({ to: routeForRole(session.role), replace: true });
+    } catch (reason) {
+      setFirstLoginError(reason instanceof Error ? reason.message : "Activation impossible.");
+    } finally {
+      setIsActivating(false);
+    }
   };
 
   return (
@@ -632,7 +701,7 @@ function LoginPage() {
               <Input
                 id="username"
                 type="text"
-                placeholder="admin"
+                placeholder="admin ou COM-AB12CD"
                 value={username}
                 autoComplete="off"
                 onChange={(e) => setUsername(e.target.value)}
@@ -641,6 +710,7 @@ function LoginPage() {
                 required
                 className="h-14 bg-background border-border/60 px-4 text-base focus:border-primary"
               />
+              <p className="text-sm text-muted-foreground">Premiere connexion agent : utilisez l'identifiant et le mot de passe initial fournis par l'Admin.</p>
             </div>
 
             <div className="space-y-3">
@@ -689,6 +759,70 @@ function LoginPage() {
           </form>
         </div>
       </div>
+
+      {pendingFirstLogin ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            aria-label="Fermer"
+            onClick={() => !isActivating && setPendingFirstLogin(null)}
+          />
+          <div className="relative z-10 w-full max-w-md rounded-2xl border bg-background p-6 shadow-2xl">
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold">Premiere connexion</h2>
+              <p className="text-sm text-muted-foreground">
+                {pendingFirstLogin.fullName}, definissez maintenant votre mot de passe personnel pour acceder a l'espace {pendingFirstLogin.role}.
+              </p>
+            </div>
+
+            <div className="mt-5 rounded-xl border bg-muted/30 p-4 text-sm">
+              <p><span className="font-medium">Identifiant :</span> {pendingFirstLogin.identifier}</p>
+              <p className="mt-1"><span className="font-medium">Mot de passe initial :</span> {pendingFirstLogin.accessCode}</p>
+            </div>
+
+            <form onSubmit={handleFirstLoginActivation} className="mt-5 space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  placeholder="Minimum 6 caracteres"
+                  autoFocus
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="Retapez le mot de passe"
+                />
+              </div>
+
+              {firstLoginError ? (
+                <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                  {firstLoginError}
+                </div>
+              ) : null}
+
+              <div className="flex gap-2">
+                <Button type="submit" className="flex-1" disabled={isActivating}>
+                  {isActivating ? "Activation..." : "Enregistrer le mot de passe"}
+                </Button>
+                <Button type="button" variant="outline" disabled={isActivating} onClick={() => setPendingFirstLogin(null)}>
+                  Annuler
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

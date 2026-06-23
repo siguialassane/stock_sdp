@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AdminPageHeader } from "@/features/admin/components/admin-page-header";
+import { PageHeader } from "@/components/page-header";
 import { SettingsSection } from "@/features/admin/settings/settings-section";
 import { useAdminStore } from "@/features/admin/store/admin-store";
 import type { AdminSettingsData } from "@/features/admin/types";
@@ -40,7 +40,7 @@ export function AdminSettings() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <AdminPageHeader title="Parametres" description="Configuration globale partagee par tous les modules." action={<Button type="submit" disabled={isSaving}>{saved && <CheckCircle2 className="mr-2 h-4 w-4" />}{isSaving ? "Enregistrement..." : saved ? "Enregistre" : "Enregistrer"}</Button>} />
+      <PageHeader title="Parametres" description="Configuration globale partagee par tous les modules." action={<Button type="submit" disabled={isSaving}>{saved && <CheckCircle2 className="mr-2 h-4 w-4" />}{isSaving ? "Enregistrement..." : saved ? "Enregistre" : "Enregistrer"}</Button>} />
       {error && <p className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</p>}
       <SettingsSection icon={Building2} title="Entreprise" description="Identite affichee sur les futurs documents"><Field id="company-name" label="Nom" value={form.companyName} onChange={(value) => update("companyName", value)} placeholder="Nom de l'entreprise" /><Field id="company-contact" label="Contact" value={form.companyContact} onChange={(value) => update("companyContact", value)} placeholder="Email ou telephone" /></SettingsSection>
       <SettingsSection icon={MapPin} title="Entrepot" description="Entrepot unique de la version 1"><Field id="warehouse-name" label="Nom" value={form.warehouseName} onChange={(value) => update("warehouseName", value)} placeholder="Entrepot principal" /><Field id="warehouse-address" label="Adresse" value={form.warehouseAddress} onChange={(value) => update("warehouseAddress", value)} placeholder="Adresse de l'entrepot" /></SettingsSection>

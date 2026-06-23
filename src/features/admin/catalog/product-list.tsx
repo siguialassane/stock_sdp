@@ -8,7 +8,7 @@ import { CatalogActions } from "@/features/admin/catalog/catalog-actions";
 import { CatalogDetailDialog } from "@/features/admin/catalog/catalog-detail-dialog";
 import { CatalogRowActions } from "@/features/admin/catalog/catalog-row-actions";
 import type { CatalogEditTarget } from "@/features/admin/catalog/catalog-types";
-import { EmptyState } from "@/features/admin/components/empty-state";
+import { EmptyState } from "@/components/empty-state";
 import { useAdminStore } from "@/features/admin/store/admin-store";
 import { formatCurrency } from "@/lib/format/currency";
 

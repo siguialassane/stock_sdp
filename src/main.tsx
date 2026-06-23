@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from '@/features/auth/auth-context'
 import { ThemeProvider } from '@/components/theme/theme-provider'
+import { Toaster } from '@/components/toast/toast'
 import './index.css'
 import App from './App'
 
@@ -15,6 +16,7 @@ createRoot(document.getElementById('root')!).render(
         <AuthProvider>
           <App />
         </AuthProvider>
+        <Toaster />
       </QueryClientProvider>
     </ThemeProvider>
   </StrictMode>,

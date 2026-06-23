@@ -2,7 +2,7 @@ import { Activity } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState } from "@/features/admin/components/empty-state";
+import { EmptyState } from "@/components/empty-state";
 import { ADMIN_AGENT_ACTIVITIES } from "@/mocks/admin.mock";
 
 /**

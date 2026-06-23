@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Pencil, Plus, X } from "lucide-react";
 
 import { AmountInput } from "@/components/amount-input";
+import { useToast } from "@/components/toast/toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +28,7 @@ export function ProductForm({
   onAddVariant?: (productId: string) => void;
 }) {
   const store = useAdminStore();
+  const toast = useToast();
   const product = target?.kind === "product" ? store.products.find((item) => item.id === target.id) : undefined;
   const variant = target?.kind === "variant" ? store.products.flatMap((item) => item.variantes).find((item) => item.id === target.id) : undefined;
   const variantOnly = Boolean(parentProductId || variant);
@@ -57,18 +59,24 @@ export function ProductForm({
     try {
       if (target?.kind === "product") {
         await store.updateProduct(target.id, typeId, name.trim(), description.trim());
+        toast.success({ title: "Produit modifie", message: `${name.trim()} a ete mis a jour.` });
       } else if (target?.kind === "variant") {
         await store.updateVariant(target.id, productId, unit, code.trim().toUpperCase(), numericPrice);
+        toast.success({ title: "Variante modifiee", message: `La variante ${code.trim().toUpperCase()} a ete mise a jour.` });
       } else if (parentProductId) {
         await store.addVariant(parentProductId, unit, code.trim().toUpperCase(), numericPrice);
+        toast.success({ title: "Variante ajoutee", message: `La variante ${code.trim().toUpperCase()} a ete creee.` });
       } else {
         const createdProduct = await store.addProduct(typeId, name.trim(), description.trim());
         await store.addVariant(createdProduct.id, unit, code.trim().toUpperCase(), numericPrice);
+        toast.success({ title: "Produit cree", message: `${name.trim()} et sa premiere variante ont ete enregistres.` });
       }
 
       onClose();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Enregistrement impossible.");
+      const message = reason instanceof Error ? reason.message : "Enregistrement impossible.";
+      setError(message);
+      toast.error({ title: "Echec de l'enregistrement", message });
     } finally {
       setSaving(false);
     }

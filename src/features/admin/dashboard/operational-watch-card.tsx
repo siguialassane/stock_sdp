@@ -2,7 +2,7 @@ import { ShieldAlert } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { EmptyState } from "@/features/admin/components/empty-state";
+import { EmptyState } from "@/components/empty-state";
 import { ADMIN_OPERATIONAL_ALERTS } from "@/mocks/admin.mock";
 
 const SEVERITY_VARIANT: Record<string, "warning" | "danger"> = {

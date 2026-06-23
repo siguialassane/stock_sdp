@@ -21,9 +21,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   };
 
   const logout = async () => {
+    const currentSession = session;
     clearAuthSession();
     setSession(null);
-    await signOut();
+    await signOut(currentSession);
   };
 
   return <AuthContext.Provider value={{ session, login, logout }}>{children}</AuthContext.Provider>;
