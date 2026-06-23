@@ -108,6 +108,7 @@ export function CommercialSales() {
 
       {canCreateSale ? (
         <SaleForm
+          key={editingSale?.id ?? "new-sale"}
           catalog={catalog}
           customers={customers}
           initialSale={editingSale}

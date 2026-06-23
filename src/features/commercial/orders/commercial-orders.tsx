@@ -23,6 +23,7 @@ export function CommercialOrders() {
   const [cancelTarget, setCancelTarget] = useState<CommercialSale | null>(null);
   const [detailSaleId, setDetailSaleId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [actionError, setActionError] = useState("");
 
   const selectedSale = detailSaleId ? sales.find((sale) => sale.id === detailSaleId) ?? null : null;
 
@@ -35,6 +36,7 @@ export function CommercialOrders() {
     if (!cancelTarget) return;
 
     setIsCancelling(true);
+    setActionError("");
 
     try {
       const updatedSale = await cancelCommercialSale(cancelTarget.id, { reason });
@@ -45,6 +47,8 @@ export function CommercialOrders() {
       queryClient.invalidateQueries({ queryKey: commercialQueryKeys.sales });
       setCancelTarget(null);
       setDetailSaleId(updatedSale.id);
+    } catch (reason) {
+      setActionError(reason instanceof Error ? reason.message : "Annulation impossible.");
     } finally {
       setIsCancelling(false);
     }
@@ -66,6 +70,11 @@ export function CommercialOrders() {
       {salesError ? (
         <p className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
           {salesError instanceof Error ? salesError.message : "Chargement impossible."}
+        </p>
+      ) : null}
+      {actionError ? (
+        <p className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          {actionError}
         </p>
       ) : null}
 

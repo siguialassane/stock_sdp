@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type PropsWithChildren } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { clearAuthSession, readAuthSession, writeAuthSession } from "@/features/auth/auth-storage";
 import type { AuthSession } from "@/features/auth/types";
@@ -13,6 +14,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: PropsWithChildren) {
+  const queryClient = useQueryClient();
   const [session, setSession] = useState<AuthSession | null>(() => readAuthSession());
 
   const login = (nextSession: AuthSession) => {
@@ -24,6 +26,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const currentSession = session;
     clearAuthSession();
     setSession(null);
+    queryClient.clear();
     await signOut(currentSession);
   };
 

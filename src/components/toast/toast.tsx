@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { AlertCircle, AlertTriangle, CheckCircle, Info, X } from "lucide-react";
 import {
   Toaster as SonnerToaster,
@@ -61,12 +60,6 @@ const variantIcons: Record<Variant, React.ComponentType<{ className?: string }>>
   warning: AlertTriangle,
 };
 
-const toastAnimation = {
-  initial: { opacity: 0, y: 50, scale: 0.95 },
-  animate: { opacity: 1, y: 0, scale: 1 },
-  exit: { opacity: 0, y: 50, scale: 0.95 },
-};
-
 const actionButtonClass: Record<Variant, string> = {
   default: "text-foreground border-border hover:bg-muted/10 dark:hover:bg-muted/20",
   success: "text-green-600 border-green-600 hover:bg-green-600/10 dark:hover:bg-green-400/20",
@@ -74,24 +67,15 @@ const actionButtonClass: Record<Variant, string> = {
   warning: "text-amber-600 border-amber-600 hover:bg-amber-600/10 dark:hover:bg-amber-400/20",
 };
 
-/**
- * Affiche une notification toast custom (framer-motion + sonner).
- * Rendu interne partage par toutes les variantes du hook useToast.
- */
-function renderToast(toastId: string | number, options: Required<Pick<ToastOptions, "message">> & ToastOptions) {
+function renderToast(options: Required<Pick<ToastOptions, "message">> & ToastOptions) {
   const variant = options.variant ?? "default";
   const Icon = variantIcons[variant];
 
   sonnerToast.custom(
     (id) => (
-      <motion.div
-        variants={toastAnimation}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{ duration: 0.3, ease: "easeOut" }}
+      <div
         className={cn(
-          "flex w-full max-w-xs items-center justify-between rounded-xl border p-3 shadow-md",
+          "flex w-full max-w-xs animate-in items-center justify-between rounded-xl border p-3 shadow-md duration-300 fade-in slide-in-from-bottom-4",
           variantStyles[variant],
         )}
       >
@@ -134,54 +118,41 @@ function renderToast(toastId: string | number, options: Required<Pick<ToastOptio
             <X className="h-3 w-3 text-muted-foreground" />
           </button>
         </div>
-      </motion.div>
+      </div>
     ),
     {
       duration: options.duration ?? 4000,
       position: options.position ?? "bottom-right",
-      id: toastId,
+      id: crypto.randomUUID(),
     },
   );
 }
 
-/**
- * Hook de notification global. Aucune ref necessaire : on appelle directement
- * les methodes success / error / warning / info depuis n'importe quel composant.
- *
- * @example
- * const toast = useToast();
- * toast.success({ title: "Produit cree", message: "Le produit a ete enregistre." });
- */
 export function useToast() {
   return {
     show(options: ToastOptions) {
-      renderToast(Math.random(), options);
+      renderToast(options);
     },
     success(options: Omit<ToastOptions, "variant">) {
-      renderToast(Math.random(), { ...options, variant: "success" });
+      renderToast({ ...options, variant: "success" });
     },
     error(options: Omit<ToastOptions, "variant">) {
-      renderToast(Math.random(), { ...options, variant: "error" });
+      renderToast({ ...options, variant: "error" });
     },
     warning(options: Omit<ToastOptions, "variant">) {
-      renderToast(Math.random(), { ...options, variant: "warning" });
+      renderToast({ ...options, variant: "warning" });
     },
     info(options: Omit<ToastOptions, "variant">) {
-      renderToast(Math.random(), { ...options, variant: "default" });
+      renderToast({ ...options, variant: "default" });
     },
     dismiss: sonnerToast.dismiss,
   };
 }
 
 interface ToasterProps {
-  /** Position par defaut des toasts. */
   position?: Position;
 }
 
-/**
- * Composant Toaster a monter une seule fois au niveau racine (main.tsx).
- * Portail global : disponible sur toutes les routes, independamment du routeur.
- */
 export function Toaster({ position = "bottom-right" }: ToasterProps = {}) {
   return (
     <SonnerToaster
@@ -190,5 +161,3 @@ export function Toaster({ position = "bottom-right" }: ToasterProps = {}) {
     />
   );
 }
-
-export default Toaster;

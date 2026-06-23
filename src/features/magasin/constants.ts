@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 /** Element du menu de navigation Magasin. */
-export interface MagasinNavItem {
+interface MagasinNavItem {
   label: string;
   icon: LucideIcon;
   /** Chemin absolu type par TanStack Router. */

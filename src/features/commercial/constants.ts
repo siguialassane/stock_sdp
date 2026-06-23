@@ -6,7 +6,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export interface CommercialNavItem {
+interface CommercialNavItem {
   label: string;
   icon: LucideIcon;
   to:

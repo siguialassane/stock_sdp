@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Building2, CheckCircle2, Hash, MapPin, Ruler, TriangleAlert } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -16,8 +16,12 @@ export function AdminSettings() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => setForm(settings), [settings]);
+  useEffect(() => () => {
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+  }, []);
 
   const update = <Key extends keyof AdminSettingsData>(key: Key, value: AdminSettingsData[Key]) => setForm((current) => ({ ...current, [key]: value }));
   const handleSubmit = async (event: FormEvent) => {
@@ -30,7 +34,8 @@ export function AdminSettings() {
     try {
       await saveSettings(form);
       setSaved(true);
-      window.setTimeout(() => setSaved(false), 2200);
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => setSaved(false), 2200);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Enregistrement impossible.");
     } finally {

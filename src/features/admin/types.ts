@@ -71,39 +71,3 @@ export interface AdminSettingsData {
   salesPrefix: string;
   receiptPrefix: string;
 }
-
-/* ------------------------------------------------------------------ */
-/* Supervision (tableau de bord Admin)                                */
-/* ------------------------------------------------------------------ */
-
-/** KPIs affiches dans le bloc "Resume global". */
-export interface AdminKpis {
-  totalProduitsActifs: number;
-  totalAgentsActifs: number;
-  ventesEnAttentePaiement: number;
-  ventesPretesASortir: number;
-  alertesStock: number;
-}
-
-/** Activite recente d'un agent. */
-export interface AgentActivity {
-  id: string;
-  agent: string;
-  role: RoleName;
-  action: string;
-  horodatage: string;
-}
-
-/** Type d'alerte operationnelle. */
-export type OperationalAlertType = "paiement" | "sortie" | "rupture";
-
-/** Niveau de severite d'une alerte. */
-export type Severity = "warning" | "danger";
-
-/** Alerte de surveillance operationnelle. */
-export interface OperationalAlert {
-  id: string;
-  type: OperationalAlertType;
-  libelle: string;
-  severite: Severity;
-}

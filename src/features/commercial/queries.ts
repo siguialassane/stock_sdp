@@ -3,12 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import {
   fetchCommercialCatalog,
   fetchCommercialCustomers,
-  fetchCommercialDashboard,
   fetchCommercialSales,
 } from "@/features/commercial/services/commercial.service";
 
 export const commercialQueryKeys = {
-  dashboard: ["commercial", "dashboard"] as const,
   catalog: ["commercial", "catalog"] as const,
   customers: ["commercial", "customers"] as const,
   sales: ["commercial", "sales"] as const,
@@ -19,14 +17,6 @@ const defaultQueryOptions = {
   gcTime: 1000 * 60 * 30,
   refetchOnWindowFocus: false,
 } as const;
-
-export function useCommercialDashboardQuery() {
-  return useQuery({
-    queryKey: commercialQueryKeys.dashboard,
-    queryFn: fetchCommercialDashboard,
-    ...defaultQueryOptions,
-  });
-}
 
 export function useCommercialCatalogQuery() {
   return useQuery({

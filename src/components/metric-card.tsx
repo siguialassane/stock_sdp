@@ -15,8 +15,7 @@ interface MetricCardProps {
  * Le helper (statistique detaillee) est masque par defaut et revele au survol
  * de la card (glisse + fondu), dans une zone reservee pour eviter tout saut de hauteur.
  *
- * Initialement defini dans features/dashboard, extrait ici en composant UI generique
- * pour etre partage entre le dashboard et l'ecran Admin.
+ * Partage entre les tableaux de bord par role.
  */
 export function MetricCard({ title, value, helper, icon: Icon }: MetricCardProps) {
   return (

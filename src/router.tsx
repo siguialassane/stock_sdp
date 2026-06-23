@@ -1,50 +1,18 @@
 import {
   Navigate,
-  Outlet,
   createRootRoute,
   createRoute,
   createRouter,
   redirect,
 } from "@tanstack/react-router";
 
-import { AdminCatalog } from "@/features/admin/catalog/admin-catalog";
-import { AdminDashboard } from "@/features/admin/dashboard/admin-dashboard";
-import { AdminSettings } from "@/features/admin/settings/admin-settings";
-import { AdminUsers } from "@/features/admin/users/admin-users";
+import { getHomeRoute } from "@/features/auth/role-routes";
+import { requireSession } from "@/features/auth/route-guard";
 import { readAuthSession } from "@/features/auth/auth-storage";
-import type { AppRole } from "@/features/auth/types";
-import { CommercialCustomers } from "@/features/commercial/customers/commercial-customers";
-import { CommercialDashboard } from "@/features/commercial/dashboard/commercial-dashboard";
-import { CommercialOrders } from "@/features/commercial/orders/commercial-orders";
-import { CommercialSales } from "@/features/commercial/sales/commercial-sales";
-import { MagasinReceptions } from "@/features/magasin/receptions/magasin-receptions";
-import { MagasinSorties } from "@/features/magasin/sorties/magasin-sorties";
-import { MagasinDashboard } from "@/features/magasin/dashboard/magasin-dashboard";
-import { MagasinStock } from "@/features/magasin/stock/magasin-stock";
-import AdminPage from "@/pages/AdminPage";
-import CommercialPage from "@/pages/CommercialPage";
-import DashboardPage from "@/pages/DashboardPage";
-import LoginPage from "@/pages/LoginPage";
-import MagasinPage from "@/pages/MagasinPage";
-
-function homeRouteForRole(role?: AppRole) {
-  if (role === "Admin") return "/admin/dashboard" as const;
-  if (role === "Magasin") return "/magasin/dashboard" as const;
-  if (role === "Commercial") return "/commercial/dashboard" as const;
-  return "/login" as const;
-}
-
-function requireSession(role?: AppRole | AppRole[]) {
-  const session = readAuthSession();
-  const acceptedRoles = Array.isArray(role) ? role : role ? [role] : undefined;
-
-  if (!session || (acceptedRoles && !acceptedRoles.includes(session.role))) {
-    throw redirect({ to: "/login" });
-  }
-}
+import * as Screens from "@/router-components";
 
 const rootRoute = createRootRoute({
-  component: Outlet,
+  component: Screens.RootLayout,
   notFoundComponent: () => <Navigate to="/" replace />,
 });
 
@@ -53,28 +21,25 @@ const indexRoute = createRoute({
   path: "/",
   beforeLoad: () => {
     const session = readAuthSession();
-    throw redirect({ to: homeRouteForRole(session?.role) });
+    throw redirect({ to: getHomeRoute(session?.role) ?? "/login" });
   },
 });
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
-  component: LoginPage,
-});
-
-const dashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/dashboard",
-  beforeLoad: () => requireSession(),
-  component: DashboardPage,
+  beforeLoad: () => {
+    const homeRoute = getHomeRoute(readAuthSession()?.role);
+    if (homeRoute) throw redirect({ to: homeRoute });
+  },
+  component: Screens.LoginPage,
 });
 
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/admin",
   beforeLoad: () => requireSession("Admin"),
-  component: AdminPage,
+  component: Screens.AdminPage,
 });
 
 const adminIndexRoute = createRoute({
@@ -88,32 +53,32 @@ const adminIndexRoute = createRoute({
 const adminDashboardRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: "dashboard",
-  component: AdminDashboard,
+  component: Screens.AdminDashboard,
 });
 
 const adminCatalogRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: "catalogue",
-  component: AdminCatalog,
+  component: Screens.AdminCatalog,
 });
 
 const adminUsersRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: "utilisateurs",
-  component: AdminUsers,
+  component: Screens.AdminUsers,
 });
 
 const adminSettingsRoute = createRoute({
   getParentRoute: () => adminRoute,
   path: "parametres",
-  component: AdminSettings,
+  component: Screens.AdminSettings,
 });
 
 const commercialRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/commercial",
   beforeLoad: () => requireSession("Commercial"),
-  component: CommercialPage,
+  component: Screens.CommercialPage,
 });
 
 const commercialIndexRoute = createRoute({
@@ -127,32 +92,32 @@ const commercialIndexRoute = createRoute({
 const commercialDashboardRoute = createRoute({
   getParentRoute: () => commercialRoute,
   path: "dashboard",
-  component: CommercialDashboard,
+  component: Screens.CommercialDashboard,
 });
 
 const commercialSalesRoute = createRoute({
   getParentRoute: () => commercialRoute,
   path: "ventes",
-  component: CommercialSales,
+  component: Screens.CommercialSales,
 });
 
 const commercialOrdersRoute = createRoute({
   getParentRoute: () => commercialRoute,
   path: "commandes",
-  component: CommercialOrders,
+  component: Screens.CommercialOrders,
 });
 
 const commercialCustomersRoute = createRoute({
   getParentRoute: () => commercialRoute,
   path: "clients",
-  component: CommercialCustomers,
+  component: Screens.CommercialCustomers,
 });
 
 const magasinRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/magasin",
   beforeLoad: () => requireSession("Magasin"),
-  component: MagasinPage,
+  component: Screens.MagasinPage,
 });
 
 const magasinIndexRoute = createRoute({
@@ -166,52 +131,33 @@ const magasinIndexRoute = createRoute({
 const magasinDashboardRoute = createRoute({
   getParentRoute: () => magasinRoute,
   path: "dashboard",
-  component: MagasinDashboard,
+  component: Screens.MagasinDashboard,
 });
 
 const magasinStockRoute = createRoute({
   getParentRoute: () => magasinRoute,
   path: "stock",
-  component: MagasinStock,
+  component: Screens.MagasinStock,
 });
 
 const magasinReceptionsRoute = createRoute({
   getParentRoute: () => magasinRoute,
   path: "receptions",
-  component: MagasinReceptions,
+  component: Screens.MagasinReceptions,
 });
 
 const magasinSortiesRoute = createRoute({
   getParentRoute: () => magasinRoute,
   path: "sorties",
-  component: MagasinSorties,
+  component: Screens.MagasinSorties,
 });
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
-  dashboardRoute,
-  adminRoute.addChildren([
-    adminIndexRoute,
-    adminDashboardRoute,
-    adminCatalogRoute,
-    adminUsersRoute,
-    adminSettingsRoute,
-  ]),
-  commercialRoute.addChildren([
-    commercialIndexRoute,
-    commercialDashboardRoute,
-    commercialCustomersRoute,
-    commercialSalesRoute,
-    commercialOrdersRoute,
-  ]),
-  magasinRoute.addChildren([
-    magasinIndexRoute,
-    magasinDashboardRoute,
-    magasinStockRoute,
-    magasinReceptionsRoute,
-    magasinSortiesRoute,
-  ]),
+  adminRoute.addChildren([adminIndexRoute, adminDashboardRoute, adminCatalogRoute, adminUsersRoute, adminSettingsRoute]),
+  commercialRoute.addChildren([commercialIndexRoute, commercialDashboardRoute, commercialCustomersRoute, commercialSalesRoute, commercialOrdersRoute]),
+  magasinRoute.addChildren([magasinIndexRoute, magasinDashboardRoute, magasinStockRoute, magasinReceptionsRoute, magasinSortiesRoute]),
 ]);
 
 export const router = createRouter({ routeTree });

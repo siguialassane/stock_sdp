@@ -7,18 +7,6 @@
 /* Stock                                                              */
 /* ------------------------------------------------------------------ */
 
-/** Etat de stock d'une variante dans l'entrepot unique. */
-export interface StockBalance {
-  id: string;
-  /** Libelle produit (type + nom) pour l'affichage. */
-  produit: string;
-  varianteCode: string;
-  unite: "carton" | "kilo";
-  quantite: number;
-  /** Seuil en dessous duquel une alerte est levee. */
-  seuilAlerte: number;
-}
-
 /** Niveau de severite d'une alerte de stock. */
 export type StockAlertSeverity = "warning" | "danger";
 
@@ -65,16 +53,4 @@ export interface Sortie {
   lignes: number;
   montantTotal: number;
   statut: SortieStatus;
-}
-
-/* ------------------------------------------------------------------ */
-/* Tableau de bord Magasin                                            */
-/* ------------------------------------------------------------------ */
-
-/** KPIs affiches dans le tableau de bord Magasin. */
-export interface MagasinKpis {
-  referencesEnStock: number;
-  receptionsEnAttente: number;
-  sortiesAValider: number;
-  alertesStock: number;
 }

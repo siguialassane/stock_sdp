@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/features/auth/auth-context";
+import { getCommercialDashboardMetrics } from "@/features/commercial/dashboard/commercial-dashboard.metrics";
 import {
   useCommercialCustomersQuery,
   useCommercialSalesQuery,
@@ -14,39 +15,6 @@ import {
   getCommercialSaleStatusVariant,
 } from "@/features/commercial/sales/sale-status";
 import { formatCurrency } from "@/lib/format/currency";
-
-function isSameDay(date: Date, target: Date) {
-  return date.getFullYear() === target.getFullYear()
-    && date.getMonth() === target.getMonth()
-    && date.getDate() === target.getDate();
-}
-
-function startOfWeek(date: Date) {
-  const result = new Date(date);
-  const day = result.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  result.setDate(result.getDate() + diff);
-  result.setHours(0, 0, 0, 0);
-  return result;
-}
-
-function startOfMonth(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
-
-function countSalesAmountWithinRange(dates: Date[], amounts: number[], predicate: (date: Date) => boolean) {
-  return dates.reduce(
-    (accumulator, date, index) => {
-      if (!predicate(date)) return accumulator;
-
-      return {
-        count: accumulator.count + 1,
-        amount: accumulator.amount + amounts[index],
-      };
-    },
-    { count: 0, amount: 0 },
-  );
-}
 
 export function CommercialDashboard() {
   const { session } = useAuth();
@@ -61,15 +29,7 @@ export function CommercialDashboard() {
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime())
     .slice(0, 6);
 
-  const now = new Date();
-  const weekStart = startOfWeek(now);
-  const monthStart = startOfMonth(now);
-  const saleDates = sales.map((sale) => new Date(sale.createdAt));
-  const saleAmounts = sales.map((sale) => sale.totalAmount);
-
-  const dailySales = countSalesAmountWithinRange(saleDates, saleAmounts, (date) => isSameDay(date, now));
-  const weeklySales = countSalesAmountWithinRange(saleDates, saleAmounts, (date) => date >= weekStart);
-  const monthlySales = countSalesAmountWithinRange(saleDates, saleAmounts, (date) => date >= monthStart);
+  const metrics = getCommercialDashboardMetrics(sales);
   const error = customersError ?? salesError;
 
   return (
@@ -88,20 +48,20 @@ export function CommercialDashboard() {
       <div className="grid gap-4 md:grid-cols-3">
         <MetricCard
           title="Ventes du jour"
-          value={formatCurrency(dailySales.amount)}
-          helper={`${dailySales.count} commande(s) aujourd'hui`}
+          value={formatCurrency(metrics.daily.amount)}
+          helper={`${metrics.daily.count} commande(s) aujourd'hui`}
           icon={TrendingUp}
         />
         <MetricCard
           title="Ventes semaine"
-          value={formatCurrency(weeklySales.amount)}
-          helper={`${weeklySales.count} commande(s) cette semaine`}
+          value={formatCurrency(metrics.weekly.amount)}
+          helper={`${metrics.weekly.count} commande(s) cette semaine`}
           icon={ReceiptText}
         />
         <MetricCard
           title="Ventes mois"
-          value={formatCurrency(monthlySales.amount)}
-          helper={`${monthlySales.count} commande(s) ce mois-ci`}
+          value={formatCurrency(metrics.monthly.amount)}
+          helper={`${metrics.monthly.count} commande(s) ce mois-ci`}
           icon={UsersRound}
         />
       </div>

@@ -5,7 +5,6 @@ import { ReceptionsPendingCard } from "@/features/magasin/dashboard/receptions-p
 import { SortiesToValidateCard } from "@/features/magasin/dashboard/sorties-to-validate-card";
 import { StockAlertsCard } from "@/features/magasin/dashboard/stock-alerts-card";
 import type {
-  MagasinKpis,
   Reception,
   Sortie,
   StockAlert,
@@ -13,7 +12,7 @@ import type {
 
 /**
  * Tableau de bord du role Magasin.
- * Front uniquement pour ce jet : donnees videes (KPIs a 0, listes vides),
+ * Front uniquement pour ce jet : listes vides sans fausses valeurs metier,
  * pretes pour le branchement Supabase.
  *
  * 4 blocs :
@@ -24,12 +23,6 @@ import type {
  */
 export function MagasinDashboard() {
   // Donnees volontairement videes (front seul). Voir mocks quand Supabase sera branche.
-  const kpis: MagasinKpis = {
-    referencesEnStock: 0,
-    receptionsEnAttente: 0,
-    sortiesAValider: 0,
-    alertesStock: 0,
-  };
   const receptions: Reception[] = [];
   const sorties: Sortie[] = [];
   const alerts: StockAlert[] = [];
@@ -41,7 +34,7 @@ export function MagasinDashboard() {
         description="Vue d'ensemble des receptions, du stock et des sorties a valider."
       />
 
-      <MagasinKpiGrid kpis={kpis} />
+      <MagasinKpiGrid />
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <ReceptionsPendingCard receptions={receptions} />

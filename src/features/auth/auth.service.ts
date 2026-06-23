@@ -6,15 +6,11 @@ interface AppProfileRow {
   email: string;
   role_code: Lowercase<AppRole>;
   status: "pending" | "active" | "suspended";
-  first_login_required: boolean;
-  agent_code: string;
 }
 
 interface FirstLoginCandidate {
   full_name: string;
-  email: string;
   role_code: Lowercase<AppRole>;
-  agent_code: string;
   login_identifier: string;
   session_token: string;
 }
@@ -27,7 +23,6 @@ interface AppUserAuthRow {
   status: "pending" | "active" | "suspended";
   login_identifier: string;
   must_change_password: boolean;
-  agent_code: string;
 }
 
 type SignInResult =
@@ -102,9 +97,7 @@ export async function signInUser(identifier: string, password: string): Promise<
         kind: "first-login",
         candidate: {
           full_name: appUser.full_name,
-          email: appUser.email,
           role_code: appUser.role_code,
-          agent_code: appUser.agent_code,
           login_identifier: appUser.login_identifier,
           session_token: appUser.session_token,
         },

@@ -10,14 +10,6 @@ export type CommercialSaleStatus =
   | "completed"
   | "cancelled";
 
-export interface CommercialDashboardData {
-  fullName: string;
-  email: string;
-  activeProductCount: number;
-  activeTypeCount: number;
-  activeVariantCount: number;
-}
-
 export interface CommercialCatalogItem {
   productId: string;
   productName: string;
@@ -77,6 +69,7 @@ export interface CommercialSale {
 }
 
 export interface CommercialSaleDraftLine {
+  draftId: string;
   variantId: string;
   quantity: string;
   unitPrice?: number;

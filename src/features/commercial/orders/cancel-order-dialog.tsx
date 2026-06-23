@@ -46,7 +46,7 @@ export function CancelOrderDialog({
         type="button"
         className="absolute inset-0 bg-black/55 backdrop-blur-sm"
         aria-label="Fermer la fenetre d'annulation"
-        onClick={onClose}
+        onClick={() => !isSaving && onClose()}
       />
 
       <Card className="relative z-10 w-full max-w-2xl shadow-2xl">
@@ -61,7 +61,7 @@ export function CancelOrderDialog({
             </p>
           </div>
 
-          <Button type="button" variant="ghost" size="icon" aria-label="Fermer" onClick={onClose}>
+          <Button type="button" variant="ghost" size="icon" aria-label="Fermer" onClick={onClose} disabled={isSaving}>
             <X className="h-5 w-5" />
           </Button>
         </CardHeader>

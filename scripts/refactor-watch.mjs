@@ -55,7 +55,7 @@ function inspectFile(filePath) {
     warnings.push(`WARN  ${relativePath}: ${componentCount} composants/fonctions UI detectes`);
   }
 
-  if (effectCount > 2) {
+  if (effectCount > 2 && extname(filePath) === ".tsx" && componentCount > 0) {
     warnings.push(`WARN  ${relativePath}: ${effectCount} useEffect detectes`);
   }
 

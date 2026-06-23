@@ -28,20 +28,20 @@ export function AdminKpiGrid() {
       />
       <MetricCard
         title="Ventes en attente"
-        value="0"
-        helper="En attente d'encaissement (Caisse)"
+        value="—"
+        helper="Disponible apres le branchement du module Caisse"
         icon={PackageCheck}
       />
       <MetricCard
         title="Pretes a sortir"
-        value="0"
-        helper="En attente de validation Magasin"
+        value="—"
+        helper="Disponible apres le branchement du flux Magasin"
         icon={Truck}
       />
       <MetricCard
         title="Alertes stock"
-        value="0"
-        helper="Stock faible et ruptures confondus"
+        value="—"
+        helper="Disponible apres le branchement du stock"
         icon={AlertTriangle}
       />
     </div>
