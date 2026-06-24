@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/empty-state";
 import { PageHeader } from "@/components/page-header";
+import { useToast } from "@/components/toast/toast";
 import {
   commercialQueryKeys,
   useCommercialCatalogQuery,
@@ -24,6 +25,7 @@ import { canEditCommercialSale, type CommercialSale, type CommercialSaleInput } 
 export function CommercialSales() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const { clearEditingSale, draftSale } = useCommercialSalesDraft();
   const { data: catalog = [], error: catalogError } = useCommercialCatalogQuery();
   const { data: customers = [], error: customersError } = useCommercialCustomersQuery();
@@ -75,9 +77,12 @@ export function CommercialSales() {
       queryClient.invalidateQueries({ queryKey: commercialQueryKeys.sales });
       setError("");
       clearEditingSale();
+      toast.success({ title: editingSale ? "Commande modifiee" : "Commande creee", message: editingSale ? "La commande a ete mise a jour." : "La commande a ete enregistree, elle attend le paiement." });
       await navigate({ to: "/commercial/commandes" });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Enregistrement impossible.");
+      const message = reason instanceof Error ? reason.message : "Enregistrement impossible.";
+      setError(message);
+      toast.error({ title: "Echec de l'enregistrement", message });
     } finally {
       setIsSaving(false);
     }
@@ -90,7 +95,7 @@ export function CommercialSales() {
         description={
           editingSale
             ? "La commande reste modifiable tant que la Caisse n'a pas encore valide un paiement."
-            : "Le Commercial saisit ici une nouvelle commande sans afficher l'historique sur ce meme ecran."
+            : undefined
         }
         action={
           <Button type="button" variant="outline" onClick={() => void navigate({ to: "/commercial/commandes" })}>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CancelOrderDialog } from "@/features/commercial/orders/cancel-order-dialog";
 import { PageHeader } from "@/components/page-header";
+import { useToast } from "@/components/toast/toast";
 import { commercialQueryKeys, useCommercialSalesQuery } from "@/features/commercial/queries";
 import { OrderDetailDialog } from "@/features/commercial/orders/order-detail-dialog";
 import { OrderDetailCard } from "@/features/commercial/orders/order-detail-card";
@@ -18,6 +19,7 @@ import type { CommercialSale } from "@/features/commercial/types";
 export function CommercialOrders() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const toast = useToast();
   const { startEditingSale } = useCommercialSalesDraft();
   const { data: sales = [], error: salesError } = useCommercialSalesQuery();
   const [cancelTarget, setCancelTarget] = useState<CommercialSale | null>(null);
@@ -47,8 +49,11 @@ export function CommercialOrders() {
       queryClient.invalidateQueries({ queryKey: commercialQueryKeys.sales });
       setCancelTarget(null);
       setDetailSaleId(updatedSale.id);
+      toast.warning({ title: "Commande annulee", message: `${cancelTarget.customerName} - ${cancelTarget.orderNumber} a ete annulee.` });
     } catch (reason) {
-      setActionError(reason instanceof Error ? reason.message : "Annulation impossible.");
+      const message = reason instanceof Error ? reason.message : "Annulation impossible.";
+      setActionError(message);
+      toast.error({ title: "Annulation impossible", message });
     } finally {
       setIsCancelling(false);
     }

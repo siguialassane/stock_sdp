@@ -38,7 +38,7 @@ export function NotificationsPopover() {
             )}
           />
           {count > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-500 px-1 text-[10px] font-semibold text-white">
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-sm bg-blue-500 px-1 text-[10px] font-semibold text-white">
               {count > 9 ? "9+" : count}
             </span>
           )}
@@ -47,7 +47,7 @@ export function NotificationsPopover() {
       <PopoverContent align="end" className="w-80 p-0">
         <div className="flex items-center justify-between border-b p-4">
           <p className="text-sm font-semibold">Notifications</p>
-          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+          <span className="rounded-sm bg-muted px-2 py-0.5 text-xs text-muted-foreground">
             {count} en attente
           </span>
         </div>

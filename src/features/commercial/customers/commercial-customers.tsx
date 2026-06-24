@@ -4,6 +4,7 @@ import { ArrowLeft, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
+import { useToast } from "@/components/toast/toast";
 import { CustomerForm } from "@/features/commercial/customers/customer-form";
 import { CustomerList } from "@/features/commercial/customers/customer-list";
 import { commercialQueryKeys, useCommercialCustomersQuery } from "@/features/commercial/queries";
@@ -16,6 +17,7 @@ import type { CommercialCustomer, CommercialCustomerInput } from "@/features/com
 export function CommercialCustomers() {
   const queryClient = useQueryClient();
   const { data: customers = [], error: customersError } = useCommercialCustomersQuery();
+  const toast = useToast();
   const [error, setError] = useState("");
   const [view, setView] = useState<"list" | "form">("list");
   const [editingCustomer, setEditingCustomer] = useState<CommercialCustomer | null>(null);
@@ -60,8 +62,11 @@ export function CommercialCustomers() {
       setView("list");
       setEditingCustomer(null);
       setError("");
+      toast.success({ title: editingCustomer ? "Client modifie" : "Client cree", message: `${input.fullName} a ete enregistre avec succes.` });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Enregistrement impossible.");
+      const message = reason instanceof Error ? reason.message : "Enregistrement impossible.";
+      setError(message);
+      toast.error({ title: "Echec de l'enregistrement", message });
     } finally {
       setIsSaving(false);
     }
@@ -82,8 +87,11 @@ export function CommercialCustomers() {
         current.map((item) => (item.id === updated.id ? updated : item)),
       );
       queryClient.invalidateQueries({ queryKey: commercialQueryKeys.customers });
+      toast.success({ title: customer.isActive ? "Client desactive" : "Client active", message: `${customer.fullName} est ${customer.isActive ? "desormais inactif" : "de nouveau actif"}.` });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Mise a jour impossible.");
+      const message = reason instanceof Error ? reason.message : "Mise a jour impossible.";
+      setError(message);
+      toast.error({ title: "Action impossible", message });
     }
   };
 
@@ -91,7 +99,6 @@ export function CommercialCustomers() {
     <div className="space-y-6">
       <PageHeader
         title="Clients"
-        description="Le Commercial gere ici ses grossistes et demi-grossistes pour rattacher correctement les ventes."
         action={
           view === "form" ? (
             <Button

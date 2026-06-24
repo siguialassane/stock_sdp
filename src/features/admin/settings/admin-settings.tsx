@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageHeader } from "@/components/page-header";
+import { useToast } from "@/components/toast/toast";
 import { SettingsSection } from "@/features/admin/settings/settings-section";
 import { useAdminStore } from "@/features/admin/store/admin-store";
 import type { AdminSettingsData } from "@/features/admin/types";
 
 export function AdminSettings() {
   const { settings, saveSettings } = useAdminStore();
+  const toast = useToast();
   const [form, setForm] = useState<AdminSettingsData>(settings);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
@@ -36,8 +38,11 @@ export function AdminSettings() {
       setSaved(true);
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
       savedTimerRef.current = setTimeout(() => setSaved(false), 2200);
+      toast.success({ title: "Parametres enregistres", message: "La configuration globale a ete mise a jour." });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Enregistrement impossible.");
+      const message = reason instanceof Error ? reason.message : "Enregistrement impossible.";
+      setError(message);
+      toast.error({ title: "Echec de l'enregistrement", message });
     } finally {
       setIsSaving(false);
     }

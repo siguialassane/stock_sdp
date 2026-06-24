@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { useToast } from "@/components/toast/toast";
 import { useAuth } from "@/features/auth/auth-context";
 import { completeFirstLogin, signInUser } from "@/features/auth/auth.service";
 import {
@@ -42,6 +43,7 @@ export default function LoginPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [firstLoginError, setFirstLoginError] = useState("");
+  const toast = useToast();
   const [isActivating, setIsActivating] = useState(false);
 
   useEffect(() => {
@@ -71,9 +73,12 @@ export default function LoginPage() {
 
       const homeRoute = getAvailableHomeRoute(result.session.role);
       login(result.session);
+      toast.success({ title: "Connexion reussie", message: `Bienvenue dans votre espace ${result.session.role}.` });
       await navigate({ to: homeRoute, replace: true });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "Connexion impossible.");
+      const message = reason instanceof Error ? reason.message : "Connexion impossible.";
+      setError(message);
+      toast.error({ title: "Connexion impossible", message });
     } finally {
       setIsLoading(false);
     }
@@ -107,9 +112,12 @@ export default function LoginPage() {
       login(session);
       setPendingFirstLogin(null);
       setPassword("");
+      toast.success({ title: "Compte active", message: "Votre mot de passe a ete defini. Bonne navigation !" });
       await navigate({ to: homeRoute, replace: true });
     } catch (reason) {
-      setFirstLoginError(reason instanceof Error ? reason.message : "Activation impossible.");
+      const message = reason instanceof Error ? reason.message : "Activation impossible.";
+      setFirstLoginError(message);
+      toast.error({ title: "Activation impossible", message });
     } finally {
       setIsActivating(false);
     }

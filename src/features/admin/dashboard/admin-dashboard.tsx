@@ -17,7 +17,6 @@ export function AdminDashboard() {
     <div className="space-y-6">
       <PageHeader
         title="Tableau de bord"
-        description="Vue d'ensemble de l'activite et de la configuration."
       />
 
       <AdminKpiGrid />
